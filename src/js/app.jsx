@@ -1,50 +1,55 @@
 import React from 'react';
-import { Component } from 'react';
 
 import SearchForm from './searchform';
 import MovieList from './movielist';
-import $ from 'jquery';
 
-//const movies = []
+import { getJSON } from './utils/utils';
 
-export default class App extends Component {
+export default class App extends React.Component {
 	constructor(props){
 		super(props)
-		this.state = {
-			movies: []
-		}
 		this.handleTermSubmit = this.handleTermSubmit.bind(this)
+	}
+
+	componentWillMount() {
+		this.setState({
+			movies: [],
+			loading: false
+		});
 	}
 
 	handleTermSubmit(term){
 		term = term.text;
-		console.log('submit', term)
+		console.log(term);
 		let url=`http://www.omdbapi.com/?s=${term}&r=json`;
+		this.setState({loading: true});
 
+		getJSON(url).then(
+			(results) => {
+				this.setState({loading: false});
+				if(results.Response === 'False') {
+					// No movies by this name were found!
 
-		$.ajax({
-	     	url:url,
-	     	dataType:'json',
-	     	cache:false,
-	     	success:function(results){
-	     		console.log(results)
+				}
+				console.log(results)
 	     		let movies = results.Search
 	     		this.setState({movies:movies});
-	     		//console.log(this.state.movies.Title);
-	     	}.bind(this),
-	     	error:function(xhr, status, err){
-	     		//console.error(this.props.url, status, err.toString());
-	     	}.bind(this)
-	    });
-		
-
+			}
+		).catch(
+			(error) => {
+				this.setState({loading: false});
+				console.error(error);
+			}
+		);
 	}
 
 	render(){
 		return (
 			<div>
 				<h1>Search for Movies</h1>
-				<SearchForm onTermSubmit={this.handleTermSubmit}/>
+				<SearchForm
+					onTermSubmit={this.handleTermSubmit}
+					loading={this.state.loading}/>
 				<MovieList movies={this.state.movies} />
 			</div>
 		)

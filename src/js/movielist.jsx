@@ -11,7 +11,12 @@ export default class MovieList extends Component {
 				return ;
 			}
 			return (
-				<MovieListing poster={movie.Poster} title={movie.Title} year={movie.Year} review={movie.Type} key={movie.imdbID}/>
+				<MovieListing
+					poster={movie.Poster}
+					title={movie.Title}
+					year={movie.Year}
+					review={movie.Type}
+					key={movie.imdbID} />
 			)
 		})
 
